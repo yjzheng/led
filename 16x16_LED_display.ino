@@ -12,6 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+ //http://osoyoo.com/2017/01/03/arduino-16x16-matrix/
 
 #include <Arduino.h>
 
@@ -165,10 +166,10 @@ void Scan_Line( unsigned int m) {
 //************************************************************
 void Display(unsigned char dat[][32])        
 {
-    unsigned char i;
-
-  for( i = 0 ; i < 16 ; i++ )
+  unsigned char i,j;
+  for( j = 0 ; j < 16 ; j++)
   {
+    i=(j<<1)^0xf+j>>3;////i=(j*2)%16+j/8;
     digitalWrite(LEDARRAY_G, HIGH);
     
     Display_Buffer[0] = dat[0][i];    
@@ -192,7 +193,7 @@ void Display(unsigned char dat[][32])
 
     digitalWrite(LEDARRAY_G, LOW);
     
-    delayMicroseconds(300);;    
+    delayMicroseconds(234);;    
   } 
 }
 
