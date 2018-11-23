@@ -12,7 +12,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- //http://osoyoo.com/2017/01/03/arduino-16x16-matrix/
+ //http://osoyoo.com/2017/01/03/arduino-16x16-matrix/ include schematic and datasheet
+ //http://osoyoo.com/wp-content/uploads/2017/01/16-16.pdf schematic
+ //http://osoyoo.com/wp-content/uploads/2017/01/74HC138.pdf 
+ 
 
 #include <Arduino.h>
 
@@ -31,19 +34,20 @@
 #define NANO_LED_PIN 13
 
 
-unsigned char Display_Buffer[8];
+unsigned char Display_Buffer [8];
 unsigned char last_button= HIGH;
 int button_press_cnt=0;
 int button_low_cnt=0;
 bool long_press=false;
 
-//#define __FOR_FINAL__
+#define __FOR_FINAL__
 #ifdef __FOR_FINAL__
 #define Num_Of_Word 3
 #define Word Word_Final
 #else //for eliminate and practice
 #define Num_Of_Word 1
 #define Word Word_Go
+//#define Word Fork_Right
 #endif 
 
 
@@ -88,6 +92,16 @@ unsigned char Word_Final[3*2][32]=
 }
 ; 
 
+
+unsigned char Fork_Right[1*2][32]=
+{
+/*fork to right*/
+0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,
+0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x00,0x00,
+0xff,0xf0,0xf8,0xfc,0xfe,0xff,0xfe,0xfc,0xf8,0xf0,0xe0,0xc0,0x80,0x01,0x03,0x07,
+0xff,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x11,0x39,0x7d,0xff,0xff,0xff,0xff,
+}
+; 
 
 void setup() {
   pinMode(LEDARRAY_D, OUTPUT); 
@@ -169,13 +183,13 @@ void Display(unsigned char dat[][32])
   unsigned char i,j;
   for( j = 0 ; j < 16 ; j++)
   {
-    i=(j<<1)^0xf+j>>3;////i=(j*2)%16+j/8;
-    digitalWrite(LEDARRAY_G, HIGH);
+    i=(j*4)%16+j/4;
+    digitalWrite(LEDARRAY_G, HIGH);//74h138 pin 5, high to disable output
     
-    Display_Buffer[0] = dat[0][i];    
+    Display_Buffer[0] = dat[0][i]; 
     Display_Buffer[1] = dat[0][i+16];
 
-    Display_Buffer[2] = dat[1][i];    
+    Display_Buffer[2] = dat[1][i]; 
     Display_Buffer[3] = dat[1][i+16];
     
     Send(Display_Buffer[3]);
@@ -188,12 +202,12 @@ void Display(unsigned char dat[][32])
   
     digitalWrite(LEDARRAY_LAT, LOW);
     delayMicroseconds(1);
-
+ 
     Scan_Line(i);          
 
-    digitalWrite(LEDARRAY_G, LOW);
+    digitalWrite(LEDARRAY_G, LOW); //74h138 pin 5, low to show output
     
-    delayMicroseconds(234);;    
+    delayMicroseconds(150);;    
   } 
 }
 
